@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"white-goods-multifinace/configs"
-	"white-goods-multifinace/middlewares"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -25,8 +24,6 @@ func main() {
 	port := os.Getenv("APP_DEVELOPMENT_PORT")
 
 	e := echo.New()
-
-	e.Use(middlewares.CORSConfig())
 
 	// cli.Auth(e)
 	// cli.RoomingHouseRoutes(e)

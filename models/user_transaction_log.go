@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type UserTransactionLog struct {
@@ -12,4 +13,12 @@ type UserTransactionLog struct {
 	InvoiceID                   string    `json:"invoice_id" gorm:"not null"`
 	PaymentDate                 time.Time `json:"payment_date" gorm:"not null"`
 	Status                      string    `json:"status" gorm:"not null"`
+}
+
+func (utl *UserTransactionLog) BeforeCreate(tx *gorm.DB) (err error) {
+	utl.ID = uuid.New()
+	utl.CreatedAt = time.Now()
+	utl.UpdatedAt = time.Now()
+
+	return
 }
