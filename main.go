@@ -17,9 +17,9 @@ func main() {
 
 	configs.InitDB()
 
-	// seeders.SeedPeriod(config.DB)
-	// seeders.SeedFacility(config.DB)
-	// seeders.SeedTransactionCategory(config.DB)
+	// seeders.SeedOTR(configs.DB)
+	// seeders.SeedItems(configs.DB)
+	// seeders.SeedTenor(configs.DB)
 
 	port := os.Getenv("APP_DEVELOPMENT_PORT")
 

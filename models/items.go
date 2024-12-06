@@ -11,7 +11,10 @@ type Item struct {
 	BaseModel
 	Name        string      `json:"name" gorm:"not null"`
 	NormalPrice float64     `json:"normal_price" gorm:"not null"`
+	AdminFee    float64     `json:"admin_fee" gorm:"not null"`
+	OTRID       uint        `json:"otrid" gorm:"not null"`
 	ItemTenors  []ItemTenor `json:"item_tenors" gorm:"foreignKey:ItemID"`
+	Purchases   []Purchase  `json:"purchases" gorm:"foreignKey:ItemID"`
 }
 
 func (i *Item) BeforeCreate(tx *gorm.DB) (err error) {

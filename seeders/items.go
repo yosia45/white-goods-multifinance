@@ -10,15 +10,21 @@ func SeedItems(db *gorm.DB) {
 	items := []models.Item{
 		{
 			Name:        "Item 1",
-			NormalPrice: 10000000,
+			NormalPrice: 5000000,
+			AdminFee:    100000,
+			OTRID:       1,
 		},
 		{
 			Name:        "Item 2",
-			NormalPrice: 20000000,
+			NormalPrice: 3000000,
+			AdminFee:    80000,
+			OTRID:       2,
 		},
 		{
 			Name:        "Item 3",
-			NormalPrice: 50000000,
+			NormalPrice: 4000000,
+			AdminFee:    90000,
+			OTRID:       3,
 		},
 	}
 

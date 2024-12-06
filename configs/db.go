@@ -32,12 +32,12 @@ func InitDB() {
 	DB.AutoMigrate(
 		&models.User{},
 		&models.UserProfile{},
-		&models.UserMoney{},
+		&models.OTR{},
 		&models.Item{},
 		&models.Tenor{},
 		&models.ItemTenor{},
-		&models.UserPurchasingInformation{},
-		&models.UserTransactionLog{},
+		&models.UserLimit{},
+		&models.Transaction{},
 	)
 
 	log.Println("Success connecting to DB")

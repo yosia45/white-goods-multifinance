@@ -10,11 +10,12 @@ import (
 
 type User struct {
 	BaseModel
-	Email                      string                      `json:"email" gorm:"unique;not null"`
-	Password                   string                      `json:"password" gorm:"not null"`
-	UserProfile                UserProfile                 `json:"user_profile" gorm:"foreignKey:UserID"`
-	UserMoney                  UserMoney                   `json:"user_money" gorm:"foreignKey:UserID"`
-	UserPurchasingInformations []UserPurchasingInformation `json:"user_purchasing_informations" gorm:"foreignKey:UserID"`
+	Email       string      `json:"email" gorm:"unique;not null"`
+	Password    string      `json:"password" gorm:"not null"`
+	Role        string      `json:"role" gorm:"not null"`
+	UserProfile UserProfile `json:"user_profile" gorm:"foreignKey:UserID"`
+	UserLimits  []UserLimit `json:"user_limits" gorm:"foreignKey:UserID"`
+	Purchases   []Purchase  `json:"purchases" gorm:"foreignKey:UserID"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
