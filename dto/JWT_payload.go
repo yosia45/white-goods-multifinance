@@ -1,6 +1,8 @@
 package dto
 
+import "github.com/google/uuid"
+
 type JWTPayload struct {
-	UserID string `json:"user_id"`
-	Role   string `json:"role"`
+	UserID uuid.UUID `json:"user_id"`
+	Role   string    `json:"role"`
 }

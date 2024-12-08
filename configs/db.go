@@ -35,8 +35,9 @@ func InitDB() {
 		&models.OTR{},
 		&models.Item{},
 		&models.Tenor{},
-		&models.ItemTenor{},
 		&models.UserLimit{},
+		&models.ItemTenor{},
+		&models.Purchase{},
 		&models.Transaction{},
 	)
 

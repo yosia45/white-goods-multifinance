@@ -9,10 +9,9 @@ import (
 
 type Tenor struct {
 	BaseModel
-	Duration      int           `json:"duration" gorm:"not null"`
-	ItemTenors    []ItemTenor   `json:"item_tenors" gorm:"foreignKey:TenorID"`
-	UserLimits    []UserLimit   `json:"user_limits" gorm:"foreignKey:TenorID"`
-	Transacations []Transaction `json:"transactions" gorm:"foreignKey:TenorID"`
+	Duration   uint        `json:"duration" gorm:"not null"`
+	ItemTenors []ItemTenor `json:"item_tenors" gorm:"foreignKey:TenorID"`
+	UserLimits []UserLimit `json:"user_limits" gorm:"foreignKey:TenorID"`
 }
 
 func (t *Tenor) BeforeCreate(tx *gorm.DB) (err error) {

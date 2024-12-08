@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"white-goods-multifinace/configs"
+	"white-goods-multifinace/routes"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -25,7 +26,7 @@ func main() {
 
 	e := echo.New()
 
-	// cli.Auth(e)
+	routes.AuthRoutes(e)
 	// cli.RoomingHouseRoutes(e)
 	// cli.SizeRoutes(e)
 	// cli.AdditionalPriceRoutes(e)

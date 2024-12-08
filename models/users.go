@@ -15,7 +15,6 @@ type User struct {
 	Role        string      `json:"role" gorm:"not null"`
 	UserProfile UserProfile `json:"user_profile" gorm:"foreignKey:UserID"`
 	UserLimits  []UserLimit `json:"user_limits" gorm:"foreignKey:UserID"`
-	Purchases   []Purchase  `json:"purchases" gorm:"foreignKey:UserID"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

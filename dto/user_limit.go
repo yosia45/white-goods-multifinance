@@ -3,9 +3,25 @@ package dto
 import "github.com/google/uuid"
 
 type AddUserLimitBody struct {
-	UserID      uuid.UUID `json:"user_id"`
-	LimitTenor1 float64   `json:"limit_tenor_1"`
-	LimitTenor2 float64   `json:"limit_tenor_2"`
-	LimitTenor3 float64   `json:"limit_tenor_3"`
-	LimitTenor6 float64   `json:"limit_tenor_6"`
+	UserID         string  `json:"user_id"`
+	TenorID        string  `json:"tenor_id"`
+	Limit          float64 `json:"limit"`
+	CurrentBalance float64 `json:"current_balance"`
+}
+
+type UserLimitBody struct {
+	UserID         uuid.UUID `json:"user_id"`
+	TenorID        uuid.UUID `json:"tenor_id"`
+	Limit          float64   `json:"limit"`
+	CurrentBalance float64   `json:"current_balance"`
+}
+
+type UpdateCurrentBalanceUserLimit struct {
+	UserLimitID    uuid.UUID `json:"user_limit_id"`
+	CurrentBalance float64   `json:"current_balance"`
+}
+
+type UserLimitDetailResponse struct {
+	Duration uint    `json:"duration"`
+	Limit    float64 `json:"limit"`
 }
