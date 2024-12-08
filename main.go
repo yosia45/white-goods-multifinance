@@ -27,16 +27,10 @@ func main() {
 	e := echo.New()
 
 	routes.AuthRoutes(e)
-	// cli.RoomingHouseRoutes(e)
-	// cli.SizeRoutes(e)
-	// cli.AdditionalPriceRoutes(e)
-	// cli.TransactionCategoryRoutes(e)
-	// cli.PricingPackageRoutes(e)
-	// cli.RoomRoutes(e)
-	// cli.AdditionalPriceRoutes(e)
-	// cli.TransactionRoutes(e)
-	// cli.TenantRoutes(e)
-	// cli.AdminRoutes(e)
+	// routes.UserProfileRoutes(e)
+	routes.UserLimitRoutes(e)
+	routes.PurchaseRoutes(e)
+	routes.TransactionRoutes(e)
 
 	e.Logger.Fatal(e.Start(":" + port))
 }

@@ -15,7 +15,7 @@ type itemTenorRepository struct {
 	db *gorm.DB
 }
 
-func NewItemLimitRepository(db *gorm.DB) ItemTenorRepository {
+func NewItemTenorRepository(db *gorm.DB) ItemTenorRepository {
 	return &itemTenorRepository{db: db}
 }
 
