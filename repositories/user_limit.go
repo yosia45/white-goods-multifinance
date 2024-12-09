@@ -10,7 +10,7 @@ import (
 type UserLimitRepository interface {
 	CreateUserLimit(userLimits *[]models.UserLimit) error
 	FindUserLimitByUserIDTenorID(userID, tenorID uuid.UUID) (*models.UserLimit, error)
-	UpdateUserLimit(userLimit *models.UserLimit, userID uuid.UUID) error
+	UpdateUserLimit(userLimit *models.UserLimit, userID uuid.UUID, tenorID uuid.UUID) error
 	BulkUpdateUserLimit(userLimits *[]models.UserLimit, userID uuid.UUID) error
 }
 
@@ -46,8 +46,9 @@ func (r *userLimitRepository) BulkUpdateUserLimit(userLimits *[]models.UserLimit
 	return nil
 }
 
-func (r *userLimitRepository) UpdateUserLimit(userLimit *models.UserLimit, userID uuid.UUID) error {
-	if err := r.db.Model(&userLimit).Where("user_id = ?", userID).Updates(userLimit).Error; err != nil {
+func (r *userLimitRepository) UpdateUserLimit(userLimit *models.UserLimit, userID uuid.UUID, tenorID uuid.UUID) error {
+	var userLimitModel models.UserLimit
+	if err := r.db.Model(&userLimitModel).Where("user_id = ? AND tenor_id = ?", userID, tenorID).Updates(userLimit).Error; err != nil {
 		return err
 	}
 

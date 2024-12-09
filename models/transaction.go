@@ -10,6 +10,7 @@ import (
 type Transaction struct {
 	BaseModel
 	PurchaseID    uuid.UUID `json:"purchase_id" gorm:"not null;size:191"`
+	Purchase      Purchase  `json:"purchase" gorm:"foreignKey:PurchaseID"`
 	TotalAmount   float64   `json:"total_amount" gorm:"not null"`
 	PaymentDate   time.Time `json:"payment_date" gorm:"not null"`
 	InvoiceNumber string    `json:"invoice_number" gorm:"not null"`

@@ -17,5 +17,5 @@ func TransactionRoutes(e *echo.Echo) {
 
 	transactionController := controllers.NewTransactionController(transactionRepo, purchaseRepo, itemRepo, userLimitRepo)
 
-	e.POST("/transaction", transactionController.CreateTransaction, middlewares.JWTAuth)
+	e.POST("/transactions", transactionController.CreateTransaction, middlewares.JWTAuth)
 }

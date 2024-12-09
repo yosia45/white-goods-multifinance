@@ -19,7 +19,6 @@ func main() {
 	configs.InitDB()
 
 	// seeders.SeedOTR(configs.DB)
-	// seeders.SeedItems(configs.DB)
 	// seeders.SeedTenor(configs.DB)
 
 	port := os.Getenv("APP_DEVELOPMENT_PORT")
@@ -31,6 +30,7 @@ func main() {
 	routes.UserLimitRoutes(e)
 	routes.PurchaseRoutes(e)
 	routes.TransactionRoutes(e)
+	routes.ItemRoutes(e)
 
 	e.Logger.Fatal(e.Start(":" + port))
 }

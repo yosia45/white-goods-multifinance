@@ -9,6 +9,7 @@ import (
 
 type ItemTenorRepository interface {
 	FindItemLimitByItemIDTenorID(itemID, tenorID uuid.UUID) (*models.ItemTenor, error)
+	CreateItemLimit(itemTenor *[]models.ItemTenor) error
 }
 
 type itemTenorRepository struct {
@@ -17,6 +18,14 @@ type itemTenorRepository struct {
 
 func NewItemTenorRepository(db *gorm.DB) ItemTenorRepository {
 	return &itemTenorRepository{db: db}
+}
+
+func (r *itemTenorRepository) CreateItemLimit(itemTenor *[]models.ItemTenor) error {
+	if err := r.db.Create(&itemTenor).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *itemTenorRepository) FindItemLimitByItemIDTenorID(itemID, tenorID uuid.UUID) (*models.ItemTenor, error) {

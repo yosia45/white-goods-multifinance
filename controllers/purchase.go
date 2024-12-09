@@ -100,7 +100,7 @@ func (pc *PurchaseController) CreatePurchase(c echo.Context) error {
 		CurrentBalance: newUserCurrentBalance,
 	}
 
-	if err := pc.userLimitRepo.UpdateUserLimit(&newCurrentBalance, userPayload.UserID); err != nil {
+	if err := pc.userLimitRepo.UpdateUserLimit(&newCurrentBalance, userPayload.UserID, parsedTenorID); err != nil {
 		return utils.HandlerError(c, utils.NewBadRequestError("Failed to update user balance"))
 	}
 

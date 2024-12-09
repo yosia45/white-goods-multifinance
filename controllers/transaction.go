@@ -29,7 +29,7 @@ func NewTransactionController(transactionRepo repositories.TransactionRepository
 
 func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 	var transactionBody dto.AddTransactionBody
-	userPayload := c.Get("userPayload").(dto.JWTPayload)
+	userPayload := c.Get("userPayload").(*dto.JWTPayload)
 	if err := c.Bind(&transactionBody); err != nil {
 		return utils.HandlerError(c, utils.NewBadRequestError("Invalid request body"))
 	}
@@ -94,7 +94,7 @@ func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 			CurrentBalance: newCurrentBalance,
 		}
 
-		if err := tc.userLimitRepo.UpdateUserLimit(&updatedUserLimit, userPayload.UserID); err != nil {
+		if err := tc.userLimitRepo.UpdateUserLimit(&updatedUserLimit, userPayload.UserID, purchase.ItemTenor.ItemTenorID); err != nil {
 			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 		}
 	}
