@@ -3,10 +3,9 @@ package dto
 import "github.com/google/uuid"
 
 type AddUserLimitBody struct {
-	UserID         string  `json:"user_id"`
-	TenorID        string  `json:"tenor_id"`
-	Limit          float64 `json:"limit"`
-	CurrentBalance float64 `json:"current_balance"`
+	UserID  string  `json:"user_id"`
+	TenorID string  `json:"tenor_id"`
+	Limit   float64 `json:"limit"`
 }
 
 type UserLimitBody struct {

@@ -19,5 +19,5 @@ func PurchaseRoutes(e *echo.Echo) {
 
 	purchaseController := controllers.NewPurchaseController(userRepo, userLimitRepo, itemRepo, itemTenorRepo, purchaseRepo, tenorRepo)
 
-	e.POST("/purchase", purchaseController.CreatePurchase, middlewares.JWTAuth, middlewares.Authz)
+	e.POST("/purchases", purchaseController.CreatePurchase, middlewares.JWTAuth)
 }

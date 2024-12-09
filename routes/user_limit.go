@@ -13,5 +13,5 @@ func UserLimitRoutes(e *echo.Echo) {
 	userLimitRepo := repositories.NewUserLimitRepository(configs.DB)
 	userLimitController := controllers.NewUserLimitController(userLimitRepo)
 
-	e.POST("/user-limit", userLimitController.CreateUserLimit, middlewares.JWTAuth, middlewares.Authz)
+	e.POST("/user-limit", userLimitController.CreateUserLimit, middlewares.JWTAuth)
 }

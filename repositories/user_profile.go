@@ -1,15 +1,15 @@
 package repositories
 
 import (
-	"white-goods-multifinace/dto"
 	"white-goods-multifinace/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type UserProfileRepository interface {
 	CreateUserProfile(userProfile *models.UserProfile) error
-	UpdateUserProfile(userProfileBody *dto.UpdateUserProfileBody) error
+	UpdateUserProfile(userProfileBody *models.UserProfile, userID uuid.UUID) error
 }
 
 type userProfileRepository struct {
@@ -27,10 +27,11 @@ func (r *userProfileRepository) CreateUserProfile(userProfile *models.UserProfil
 	return nil
 }
 
-func (r *userProfileRepository) UpdateUserProfile(userProfileBody *dto.UpdateUserProfileBody) error {
+func (r *userProfileRepository) UpdateUserProfile(userProfileBody *models.UserProfile, userID uuid.UUID) error {
 	var user models.UserProfile
-	if err := r.db.Model(&user).Updates(userProfileBody).Error; err != nil {
+	if err := r.db.Model(&user).Where("user_id = ?", userID).Updates(userProfileBody).Error; err != nil {
 		return err
 	}
+
 	return nil
 }

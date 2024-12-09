@@ -27,7 +27,7 @@ func main() {
 	e := echo.New()
 
 	routes.AuthRoutes(e)
-	// routes.UserProfileRoutes(e)
+	routes.UserProfileRoutes(e)
 	routes.UserLimitRoutes(e)
 	routes.PurchaseRoutes(e)
 	routes.TransactionRoutes(e)
