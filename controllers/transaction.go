@@ -60,10 +60,6 @@ func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 		return utils.HandlerError(c, utils.NewBadRequestError("Total amount must be equal to monthly payment"))
 	}
 
-	if purchase.ItemTenor.Tenor.Duration > len(purchase.ItemTenor.Transactions) {
-		return utils.HandlerError(c, utils.NewBadRequestError("Transaction is already completed"))
-	}
-
 	invoiceNumber := utils.InvoiceGenerator(transactionBody.PurchaseID)
 
 	newTransaction := models.Transaction{
@@ -73,16 +69,11 @@ func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 		InvoiceNumber: invoiceNumber,
 	}
 
-	if err := tc.transactionRepo.CreateTransaction(newTransaction); err != nil {
-		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
-	}
+	if (purchase.ItemTenor.Tenor.Duration - 1) == len(purchase.ItemTenor.Transactions) {
+		if err := tc.transactionRepo.CreateTransaction(&newTransaction); err != nil {
+			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
+		}
 
-	transactions, err := tc.transactionRepo.FindTransactionByPurchaseID(parsedPurchaseID)
-	if err != nil {
-		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
-	}
-
-	if len(*transactions) == purchase.ItemTenor.Tenor.Duration {
 		userLimit, err := tc.userLimitRepo.FindUserLimitByUserIDTenorID(userPayload.UserID, purchase.ItemTenor.Tenor.TenorID)
 		if err != nil {
 			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
@@ -94,12 +85,22 @@ func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 			CurrentBalance: newCurrentBalance,
 		}
 
-		if err := tc.userLimitRepo.UpdateUserLimit(&updatedUserLimit, userPayload.UserID, purchase.ItemTenor.ItemTenorID); err != nil {
+		if err := tc.userLimitRepo.UpdateUserLimit(&updatedUserLimit, userPayload.UserID, purchase.ItemTenor.Tenor.TenorID); err != nil {
 			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 		}
-	}
 
-	return c.JSON(http.StatusCreated, map[string]string{
-		"message": "Transaction created successfully",
-	})
+		return c.JSON(http.StatusCreated, map[string]string{
+			"message": "Transaction created successfully and purchased is completed",
+		})
+	} else if purchase.ItemTenor.Tenor.Duration > len(purchase.ItemTenor.Transactions) {
+		if err := tc.transactionRepo.CreateTransaction(&newTransaction); err != nil {
+			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
+		}
+
+		return c.JSON(http.StatusCreated, map[string]string{
+			"message": "Transaction created successfully",
+		})
+	} else {
+		return utils.HandlerError(c, utils.NewBadRequestError("Transaction is already completed"))
+	}
 }

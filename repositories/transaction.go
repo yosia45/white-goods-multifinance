@@ -8,7 +8,7 @@ import (
 )
 
 type TransactionRepository interface {
-	CreateTransaction(transaction models.Transaction) error
+	CreateTransaction(transaction *models.Transaction) error
 	FindTransactionByPurchaseID(purchaseID uuid.UUID) (*[]models.Transaction, error)
 }
 
@@ -20,7 +20,7 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 	return &transactionRepository{db: db}
 }
 
-func (r *transactionRepository) CreateTransaction(transaction models.Transaction) error {
+func (r *transactionRepository) CreateTransaction(transaction *models.Transaction) error {
 	if err := r.db.Create(transaction).Error; err != nil {
 		return err
 	}
