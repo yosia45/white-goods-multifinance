@@ -20,5 +20,6 @@ func PurchaseRoutes(e *echo.Echo) {
 	purchaseController := controllers.NewPurchaseController(userRepo, userLimitRepo, itemRepo, itemTenorRepo, purchaseRepo, tenorRepo)
 
 	e.GET("/purchases", purchaseController.GetAllPurchase, middlewares.JWTAuth)
+	e.GET("/purchases/:id", purchaseController.GetPurchaseByID, middlewares.JWTAuth)
 	e.POST("/purchases", purchaseController.CreatePurchase, middlewares.JWTAuth)
 }

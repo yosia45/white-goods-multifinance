@@ -34,7 +34,6 @@ func (r *purchaseRepository) CreatePurchase(purchase *models.Purchase) error {
 func (r *purchaseRepository) FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUserPurchase, error) {
 	var purchases []dto.GetAllUserPurchase
 
-	// Query untuk mendapatkan data Purchase dan relasi terkait
 	query := `
 		SELECT 
 			p.id AS purchase_id, 
@@ -55,7 +54,7 @@ func (r *purchaseRepository) FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUse
 		JOIN item_tenors it ON p.item_tenor_id = it.id
 		JOIN items i ON it.item_id = i.id
 		JOIN tenors t ON it.tenor_id = t.id
-		LEFT JOIN otrs o ON i.otr_id = o.id
+		JOIN otrs o ON i.otr_id = o.id
 		WHERE ul.user_id = ?`
 
 	rows, err := r.db.Raw(query, userID).Rows()
@@ -85,6 +84,7 @@ func (r *purchaseRepository) FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUse
 		itemTenor.Item = item
 		itemTenor.Tenor = tenor
 		purchase.Purchases = itemTenor
+		purchase.Purchases.Item.OTR = otr
 
 		purchases = append(purchases, purchase)
 	}

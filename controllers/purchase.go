@@ -117,3 +117,19 @@ func (pc *PurchaseController) GetAllPurchase(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+func (pc *PurchaseController) GetPurchaseByID(c echo.Context) error {
+	purchaseID := c.Param("id")
+
+	parsedPurchaseID, err := uuid.Parse(purchaseID)
+	if err != nil {
+		return utils.HandlerError(c, utils.NewBadRequestError("Invalid purchase ID"))
+	}
+
+	response, err := pc.purchaseRepo.FindPurchaseByID(parsedPurchaseID)
+	if err != nil {
+		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

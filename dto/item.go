@@ -19,8 +19,8 @@ type AddItemBody struct {
 
 type ItemResponse struct {
 	ItemID      uuid.UUID   `json:"item_id"`
-	Name        string      `json:"name"`
-	NormalPrice float64     `json:"normal_price"`
-	AdminFee    float64     `json:"admin_fee"`
-	OTR         OTRResponse `json:"on_the_road"`
+	Name        string      `json:"item_name"`
+	NormalPrice float64     `json:"item_normal_price"`
+	AdminFee    float64     `json:"item_admin_fee"`
+	OTR         OTRResponse `json:"item_on_the_road"`
 }
