@@ -13,6 +13,7 @@ type PurchaseRepository interface {
 	CreatePurchase(purchase *models.Purchase) error
 	FindPurchaseByID(purchaseID uuid.UUID) (*dto.PurchaseByIDResponse, error)
 	FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUserPurchase, error)
+	UpdatePurchaseByID(purchase *models.Purchase, purchaseID uuid.UUID) error
 }
 
 type purchaseRepository struct {
@@ -186,4 +187,12 @@ func (r *purchaseRepository) FindPurchaseByID(purchaseID uuid.UUID) (*dto.Purcha
 	}
 
 	return &response, nil
+}
+
+func (r *purchaseRepository) UpdatePurchaseByID(purchase *models.Purchase, purchaseID uuid.UUID) error {
+	if err := r.db.Model(&purchase).Where("id = ?", purchaseID).Updates(purchase).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
