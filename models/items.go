@@ -13,7 +13,6 @@ type Item struct {
 	NormalPrice float64     `json:"normal_price" gorm:"not null"`
 	AdminFee    float64     `json:"admin_fee" gorm:"not null"`
 	OTRID       uint        `json:"otrid" gorm:"not null"`
-	OTR         OTR         `json:"otr" gorm:"foreignKey:OTRID"`
 	ItemTenors  []ItemTenor `json:"item_tenors" gorm:"foreignKey:ItemID"`
 }
 

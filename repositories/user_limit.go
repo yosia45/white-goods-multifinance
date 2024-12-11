@@ -52,9 +52,5 @@ func (r *userLimitRepository) UpdateUserLimit(userLimit *models.UserLimit, userI
 		return err
 	}
 
-	if r.db.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
-	}
-
 	return nil
 }
