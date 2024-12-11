@@ -106,3 +106,14 @@ func (pc *PurchaseController) CreatePurchase(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, map[string]string{"message": "Purchase created successfully"})
 }
+
+func (pc *PurchaseController) GetAllPurchase(c echo.Context) error {
+	userPayload := c.Get("userPayload").(*dto.JWTPayload)
+
+	response, err := pc.purchaseRepo.FindAllPurchase(userPayload.UserID)
+	if err != nil {
+		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

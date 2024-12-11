@@ -14,11 +14,11 @@ type PurchaseBody struct {
 	IsCompleted    bool      `json:"is_completed"`
 }
 
-type UserPurchaseResponse struct {
-	PurchaseID     string                `json:"purchase_id"`
-	MonthlyPayment float64               `json:"monthly_payment"`
-	IsCompleted    bool                  `json:"is_completed"`
-	Transactions   []TransactionResponse `json:"transactions"`
+type GetAllUserPurchase struct {
+	PurchaseID     string                  `json:"purchase_id"`
+	MonthlyPayment float64                 `json:"monthly_payment"`
+	IsCompleted    bool                    `json:"is_completed"`
+	Purchases      GetAllPurchaseItemTenor `json:"purchases"`
 }
 
 type PurchaseByIDResponse struct {

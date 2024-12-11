@@ -25,5 +25,5 @@ type UserByIDResponse struct {
 	Role      string                    `json:"role"`
 	Details   UserProfileResponse       `json:"details"`
 	Limits    []UserLimitDetailResponse `json:"limits"`
-	Purchases []UserPurchaseResponse    `json:"purchases"`
+	Purchases []GetAllUserPurchase      `json:"purchases"`
 }

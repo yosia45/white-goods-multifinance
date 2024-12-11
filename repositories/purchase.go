@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"white-goods-multifinace/dto"
 	"white-goods-multifinace/models"
 
@@ -11,7 +12,7 @@ import (
 type PurchaseRepository interface {
 	CreatePurchase(purchase *models.Purchase) error
 	FindPurchaseByID(purchaseID uuid.UUID) (*dto.PurchaseByIDResponse, error)
-	FindAllPurchase(userID uuid.UUID) (*[]dto.UserPurchaseResponse, error)
+	FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUserPurchase, error)
 }
 
 type purchaseRepository struct {
@@ -30,30 +31,69 @@ func (r *purchaseRepository) CreatePurchase(purchase *models.Purchase) error {
 	return nil
 }
 
-func (r *purchaseRepository) FindAllPurchase(userID uuid.UUID) (*[]dto.UserPurchaseResponse, error) {
-	var purchases []models.Purchase
-	// if err := r.db.Table("purchases p").
-	// 	Select("p.id, p.status, p.monthly_payment, it.id, it.amount, it.interest, i.id, i.name, o.id, o.name, tn.id, tn.duration, t.id, t.total_amount, t.payment_date, t.invoice_number, t.status").
-	// 	Joins("JOIN transactions t ON p.id = t.purchase_id").
-	// 	Joins("JOIN item_tenors it ON p.item_tenor_id = it.id").
-	// 	Joins("JOIN items i ON it.item_id = i.id").
-	// 	Joins("JOIN tenors tn ON it.tenor_id = tn.id").
-	// 	Joins("JOIN otrs o ON i.otr_id = o.id").
-	// 	Where("p.user_id = ?", userID).
-	// 	Find(&purchases).Error; err != nil {
-	// 	return nil, err
-	// }
+func (r *purchaseRepository) FindAllPurchase(userID uuid.UUID) (*[]dto.GetAllUserPurchase, error) {
+	var purchases []dto.GetAllUserPurchase
 
-	if err := r.db.Table("purchases p").
-		Select("p.id, p.monthly_payment, p.is_completed").
-		Joins("JOIN user_limits ul ON p.user_limit_id = ul.id").
-		Joins("JOIN transactions t ON p.id = t.purchase_id").
-		Where("ul.user_id = ?", userID).
-		Find(&purchases).Error; err != nil {
+	// Query untuk mendapatkan data Purchase dan relasi terkait
+	query := `
+		SELECT 
+			p.id AS purchase_id, 
+			p.monthly_payment, 
+			p.is_completed, 
+			it.id AS item_tenor_id, 
+			it.interest, 
+			i.id AS item_id, 
+			i.name AS item_name, 
+			i.normal_price, 
+			i.admin_fee, 
+			o.id AS otr_id, 
+			o.otr AS otr_name, 
+			t.id AS tenor_id, 
+			t.duration AS tenor_duration
+		FROM purchases p
+		JOIN user_limits ul ON ul.id = p.user_limit_id
+		JOIN item_tenors it ON p.item_tenor_id = it.id
+		JOIN items i ON it.item_id = i.id
+		JOIN tenors t ON it.tenor_id = t.id
+		LEFT JOIN otrs o ON i.otr_id = o.id
+		WHERE ul.user_id = ?`
+
+	rows, err := r.db.Raw(query, userID).Rows()
+	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	return nil, nil
+	for rows.Next() {
+		var purchase dto.GetAllUserPurchase
+		var itemTenor dto.GetAllPurchaseItemTenor
+		var item dto.ItemResponse
+		var tenor dto.TenorResponse
+		var otr dto.OTRResponse
+
+		err := rows.Scan(
+			&purchase.PurchaseID, &purchase.MonthlyPayment, &purchase.IsCompleted,
+			&itemTenor.ItemTenorID, &itemTenor.Interest,
+			&item.ItemID, &item.Name, &item.NormalPrice, &item.AdminFee,
+			&otr.OTRID, &otr.Name,
+			&tenor.TenorID, &tenor.Duration,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		itemTenor.Item = item
+		itemTenor.Tenor = tenor
+		purchase.Purchases = itemTenor
+
+		purchases = append(purchases, purchase)
+	}
+
+	if len(purchases) == 0 {
+		return nil, fmt.Errorf("no purchases found for user")
+	}
+
+	return &purchases, nil
 }
 
 func (r *purchaseRepository) FindPurchaseByID(purchaseID uuid.UUID) (*dto.PurchaseByIDResponse, error) {
