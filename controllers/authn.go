@@ -42,6 +42,14 @@ func (uc *UserController) RegisterCustomer(c echo.Context) error {
 		return utils.HandlerError(c, utils.NewBadRequestError("Full name is required"))
 	}
 
+	if customer.NIK == "" {
+		return utils.HandlerError(c, utils.NewBadRequestError("NIK is required"))
+	}
+
+	if len(customer.NIK) != 16 {
+		return utils.HandlerError(c, utils.NewBadRequestError("NIK must be 16 characters long"))
+	}
+
 	newCustomer := models.User{
 		Email:    customer.Email,
 		Password: customer.Password,
@@ -56,6 +64,7 @@ func (uc *UserController) RegisterCustomer(c echo.Context) error {
 	newCustomerProfile := models.UserProfile{
 		UserID:   createdUserID,
 		FullName: customer.FullName,
+		NIK:      customer.NIK,
 	}
 
 	if err := uc.userProfileRepo.CreateUserProfile(&newCustomerProfile); err != nil {

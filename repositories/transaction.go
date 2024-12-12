@@ -10,6 +10,7 @@ import (
 type TransactionRepository interface {
 	CreateTransaction(transaction *models.Transaction) error
 	FindTransactionByPurchaseID(purchaseID uuid.UUID) (*[]models.Transaction, error)
+	Begin() *gorm.DB
 }
 
 type transactionRepository struct {
@@ -35,4 +36,8 @@ func (r *transactionRepository) FindTransactionByPurchaseID(purchaseID uuid.UUID
 	}
 
 	return &transactions, nil
+}
+
+func (r *transactionRepository) Begin() *gorm.DB {
+	return r.db.Begin()
 }

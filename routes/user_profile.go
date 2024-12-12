@@ -14,4 +14,5 @@ func UserProfileRoutes(e *echo.Echo) {
 	userProfileController := controllers.NewUserProfileController(userProfileRepo)
 
 	e.PUT("/user-profile", userProfileController.UpdateUserProfile, middlewares.JWTAuth)
+	e.PUT("/user-profile/file", userProfileController.UpdateUserProfileFile, middlewares.JWTAuth)
 }

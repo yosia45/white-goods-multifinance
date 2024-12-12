@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"time"
 	"white-goods-multifinace/dto"
 	"white-goods-multifinace/models"
 	"white-goods-multifinace/repositories"
@@ -22,21 +21,55 @@ func NewUserProfileController(userProfileRepo repositories.UserProfileRepository
 	}
 }
 
-func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
-	var updatedUserBody dto.UpdateUserProfileBody
+func (upc *UserProfileController) UpdateUserProfileFile(c echo.Context) error {
+	userPayload := c.Get("userPayload").(*dto.JWTPayload)
+	var KTPFilePathURL, selfieFilePathURL string
 
-	parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedUserBody.BirthDate.Format("2006-01-02 15:04:05"))
-	if err != nil {
-		return utils.HandlerError(c, utils.NewBadRequestError("Invalid birth date format"))
+	ktpFile, err := c.FormFile("ktp_file")
+	if err == nil {
+		ktpFilePath, err := utils.SaveUploadFile(ktpFile, "assets/ktps")
+		if err != nil {
+			return utils.HandlerError(c, utils.NewInternalError("Failed to save KTP file"))
+		}
+		KTPFilePathURL = ktpFilePath
+	} else {
+		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 	}
 
-	updatedUserBody.BirthDate = parsedTime
+	selfieFile, err := c.FormFile("selfie_file")
+	if err == nil {
+		selfieFilePath, err := utils.SaveUploadFile(selfieFile, "assets/selfies")
+		if err != nil {
+			return utils.HandlerError(c, utils.NewInternalError("Failed to save selfie file"))
+		}
+		selfieFilePathURL = selfieFilePath
+	} else {
+		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
+	}
 
+	newUpdateProfile := models.UserProfile{
+		KTPFilePath:    &KTPFilePathURL,
+		SelfieFilePath: &selfieFilePathURL,
+	}
+
+	if err := upc.userProfileRepo.UpdateUserProfile(&newUpdateProfile, userPayload.UserID); err != nil {
+		return utils.HandlerError(c, utils.NewInternalError("Failed to update user profile"))
+	}
+
+	return c.JSON(http.StatusCreated, map[string]string{
+		"message": "User profile updated successfully",
+	})
+}
+
+func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
+	var updatedUserBody dto.UpdateUserProfileBody
 	userPayload := c.Get("userPayload").(*dto.JWTPayload)
 	if err := c.Bind(&updatedUserBody); err != nil {
+		fmt.Println("masuk err")
 		fmt.Println(err)
 		return utils.HandlerError(c, utils.NewBadRequestError("Invalid request body"))
 	}
+	fmt.Println(updatedUserBody)
 
 	if updatedUserBody.LegalName == "" {
 		return utils.HandlerError(c, utils.NewBadRequestError("Legal name is required"))
@@ -46,22 +79,9 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 		return utils.HandlerError(c, utils.NewBadRequestError("Full name is required"))
 	}
 
-	if updatedUserBody.NIK == "" {
-		return utils.HandlerError(c, utils.NewBadRequestError("NIK is required"))
-	}
-
-	if len(updatedUserBody.NIK) != 16 {
-		return utils.HandlerError(c, utils.NewBadRequestError("NIK must be 16 characters long"))
-	}
-
 	if updatedUserBody.BirthPlace == "" {
 		return utils.HandlerError(c, utils.NewBadRequestError("Birth place is required"))
 	}
-
-	// parsedBirthDate, err := time.Parse("2006-01-02 15:04:05", updatedUserBody.BirthDate)
-	// if err != nil {
-	// 	return utils.HandlerError(c, utils.NewBadRequestError("Invalid birth date format"))
-	// }
 
 	// if parsedBirthDate.IsZero() {
 	// 	return utils.HandlerError(c, utils.NewBadRequestError("Birth date is required"))
@@ -71,33 +91,11 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 		return utils.HandlerError(c, utils.NewBadRequestError("Salary is required"))
 	}
 
-	ktpFile, err := c.FormFile("ktp_file")
-	if err != nil {
-		ktpFilePath, err := utils.SaveUploadFile(ktpFile, "assets/ktps")
-		if err != nil {
-			return utils.HandlerError(c, utils.NewInternalError("Failed to save KTP file"))
-		}
-		updatedUserBody.KTPFilePath = ktpFilePath
-	}
-
-	selfieFile, err := c.FormFile("selfie_file")
-	if err != nil {
-		selfieFilePath, err := utils.SaveUploadFile(selfieFile, "assets/selfies")
-		if err != nil {
-			return utils.HandlerError(c, utils.NewInternalError("Failed to save selfie file"))
-		}
-		updatedUserBody.SelfieFilePath = selfieFilePath
-	}
-
 	newUpdateProfile := models.UserProfile{
-		LegalName:      updatedUserBody.LegalName,
-		FullName:       updatedUserBody.FullName,
-		NIK:            updatedUserBody.NIK,
-		BirthPlace:     updatedUserBody.BirthPlace,
-		BirthDate:      &updatedUserBody.BirthDate,
-		Salary:         updatedUserBody.Salary,
-		KTPFilePath:    updatedUserBody.KTPFilePath,
-		SelfieFilePath: updatedUserBody.SelfieFilePath,
+		LegalName:  &updatedUserBody.LegalName,
+		BirthPlace: &updatedUserBody.BirthPlace,
+		BirthDate:  &updatedUserBody.BirthDate,
+		Salary:     &updatedUserBody.Salary,
 	}
 
 	if err := upc.userProfileRepo.UpdateUserProfile(&newUpdateProfile, userPayload.UserID); err != nil {

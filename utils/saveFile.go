@@ -12,6 +12,11 @@ import (
 )
 
 func SaveUploadFile(file *multipart.FileHeader, path string) (string, error) {
+
+	if file == nil {
+		return "", fmt.Errorf("file cannot nil")
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return "", err

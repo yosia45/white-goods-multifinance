@@ -6,6 +6,7 @@ type RegisterUserBody struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	FullName string `json:"full_name"`
+	NIK      string `json:"nik"`
 }
 
 type LoginUserBody struct {
