@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -59,12 +58,10 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 	if err == nil {
 		ktpFilePath, err := utils.SaveUploadFile(ktpFile, "assets/ktps")
 		if err != nil {
-			fmt.Println(err.Error(), "err SaveUploadFile")
 			return utils.HandlerError(c, utils.NewInternalError("Failed to save KTP file"))
 		}
 		updatedUserBody.KTPFilePathURL = ktpFilePath
 	} else {
-		fmt.Println(err.Error())
 		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 	}
 

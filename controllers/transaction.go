@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
-	"sync"
 	"white-goods-multifinace/dto"
 	"white-goods-multifinace/models"
 	"white-goods-multifinace/repositories"
@@ -72,67 +70,8 @@ func (tc *TransactionController) CreateTransaction(c echo.Context) error {
 	}
 
 	if (purchase.ItemTenor.Tenor.Duration - 1) == len(purchase.ItemTenor.Transactions) {
-		var wg sync.WaitGroup
-		var mu sync.Mutex
-
-		errCh := make(chan error, 3)
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			if err := tc.transactionRepo.CreateTransaction(&newTransaction); err != nil {
-				errCh <- fmt.Errorf(err.Error())
-				return
-			}
-		}()
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			userLimit, err := tc.userLimitRepo.FindUserLimitByUserIDTenorID(userPayload.UserID, purchase.ItemTenor.Tenor.TenorID)
-			if err != nil {
-				errCh <- fmt.Errorf(err.Error())
-				return
-			}
-
-			newCurrentBalance := userLimit.CurrentBalance + purchase.ItemTenor.Item.NormalPrice
-
-			updatedUserLimit := models.UserLimit{
-				CurrentBalance: newCurrentBalance,
-			}
-
-			mu.Lock()
-			defer mu.Unlock()
-			if err := tc.userLimitRepo.UpdateUserLimit(&updatedUserLimit, userPayload.UserID, purchase.ItemTenor.Tenor.TenorID); err != nil {
-				errCh <- fmt.Errorf(err.Error())
-				return
-			}
-		}()
-
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			updatePurchase := models.Purchase{
-				IsCompleted: true,
-			}
-
-			if err := tc.purchaseRepo.UpdatePurchaseByID(&updatePurchase, parsedPurchaseID); err != nil {
-				errCh <- fmt.Errorf(err.Error())
-				return
-			}
-		}()
-
-		wg.Wait()
-
-		close(errCh)
-
-		for err := range errCh {
-			if err != nil {
-				return utils.HandlerError(c, utils.NewInternalError(err.Error()))
-			}
+		if err := tc.transactionRepo.CreateTransactionCouncurrentTransaction(&newTransaction, userPayload.UserID, purchase.ItemTenor.Tenor.TenorID, purchase.ItemTenor.Item.NormalPrice); err != nil {
+			return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 		}
 
 		return c.JSON(http.StatusCreated, map[string]string{
