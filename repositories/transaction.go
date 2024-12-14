@@ -43,7 +43,7 @@ func (r *transactionRepository) CreateTransactionCouncurrentTransaction(transact
 
 	defer func() {
 		if r := recover(); r != nil {
-			tx.Rollback() // Rollback jika terjadi panic
+			tx.Rollback()
 			errCh <- fmt.Errorf("transaction failed: %v", r)
 		}
 	}()

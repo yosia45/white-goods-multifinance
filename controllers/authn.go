@@ -56,18 +56,12 @@ func (uc *UserController) RegisterCustomer(c echo.Context) error {
 		Role:     "customer",
 	}
 
-	createdUserID, err := uc.userRepo.CreateUser(&newCustomer)
-	if err != nil {
-		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
-	}
-
 	newCustomerProfile := models.UserProfile{
-		UserID:   createdUserID,
 		FullName: customer.FullName,
 		NIK:      customer.NIK,
 	}
 
-	if err := uc.userProfileRepo.CreateUserProfile(&newCustomerProfile); err != nil {
+	if err := uc.userRepo.CreateUser(&newCustomer, &newCustomerProfile); err != nil {
 		return utils.HandlerError(c, utils.NewInternalError(err.Error()))
 	}
 
