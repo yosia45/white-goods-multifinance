@@ -13,7 +13,7 @@ type UpdateUserProfileBody struct {
 	BirthDate         time.Time `form:"birth_date"`
 	Salary            float64   `form:"salary"`
 	KTPFilePathURL    string    `form:"ktp_file"`
-	selfieFilePathURL string    `form:"selfie_file"`
+	SelfieFilePathURL string    `form:"selfie_file"`
 }
 
 type AddUserProfileBody struct {
