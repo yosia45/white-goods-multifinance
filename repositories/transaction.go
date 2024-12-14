@@ -33,7 +33,6 @@ func (r *transactionRepository) CreateTransaction(transaction *models.Transactio
 
 func (r *transactionRepository) CreateTransactionCouncurrentTransaction(transaction *models.Transaction, userID uuid.UUID, tenorID uuid.UUID, itemNormalPrice float64) error {
 	var wg sync.WaitGroup
-	var mu sync.Mutex
 
 	errCh := make(chan error, 1)
 
@@ -92,9 +91,6 @@ func (r *transactionRepository) CreateTransactionCouncurrentTransaction(transact
 		updatedUserLimit := models.UserLimit{
 			CurrentBalance: newCurrentBalance,
 		}
-
-		mu.Lock()
-		defer mu.Unlock()
 
 		if err := tx.Model(&userLimit).Where("user_id = ? AND tenor_id = ?", userID, tenorID).Updates(&updatedUserLimit).Error; err != nil {
 			tx.Rollback()
