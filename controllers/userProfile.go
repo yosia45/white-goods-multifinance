@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -54,8 +55,29 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 		return utils.HandlerError(c, utils.NewBadRequestError("Salary is required"))
 	}
 
+	userProfile, err := upc.userProfileRepo.FindUserProfileByUserID(userPayload.UserID)
+	if err != nil {
+		return utils.HandlerError(c, utils.NewInternalError("Failed to get user profile"))
+	}
+
 	ktpFile, err := c.FormFile("ktp_file")
 	if err == nil {
+		fileType, err := utils.GetFileTypeByExtension(ktpFile)
+		if err != nil {
+			return utils.HandlerError(c, utils.NewInternalError("Failed to get file type"))
+		}
+
+		if fileType != "image" {
+			return utils.HandlerError(c, utils.NewBadRequestError("KTP file must be an image type"))
+		}
+
+		if userProfile.KTPFileURL != "" {
+			if err := utils.DeleteFile(userProfile.KTPFileURL); err != nil {
+				fmt.Println(err)
+				return utils.HandlerError(c, utils.NewInternalError("Failed to delete KTP file"))
+			}
+		}
+
 		ktpFilePath, err := utils.SaveUploadFile(ktpFile, "assets/ktps")
 		if err != nil {
 			return utils.HandlerError(c, utils.NewInternalError("Failed to save KTP file"))
@@ -67,6 +89,21 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 
 	selfieFile, err := c.FormFile("selfie_file")
 	if err == nil {
+		fileType, err := utils.GetFileTypeByExtension(selfieFile)
+		if err != nil {
+			return utils.HandlerError(c, utils.NewInternalError("Failed to get file type"))
+		}
+
+		if fileType != "image" {
+			return utils.HandlerError(c, utils.NewBadRequestError("Selfie file must be an image type"))
+		}
+
+		if userProfile.SelfieURL != "" {
+			if err := utils.DeleteFile(userProfile.SelfieURL); err != nil {
+				return utils.HandlerError(c, utils.NewInternalError("Failed to delete Selfie file"))
+			}
+		}
+
 		selfieFilePath, err := utils.SaveUploadFile(selfieFile, "assets/selfies")
 		if err != nil {
 			return utils.HandlerError(c, utils.NewInternalError("Failed to save selfie file"))
@@ -77,12 +114,12 @@ func (upc *UserProfileController) UpdateUserProfile(c echo.Context) error {
 	}
 
 	newUpdateProfile := models.UserProfile{
-		LegalName:      &updatedUserBody.LegalName,
-		BirthPlace:     &updatedUserBody.BirthPlace,
+		LegalName:      updatedUserBody.LegalName,
+		BirthPlace:     updatedUserBody.BirthPlace,
 		BirthDate:      &updatedUserBody.BirthDate,
-		Salary:         &updatedUserBody.Salary,
-		KTPFilePath:    &updatedUserBody.KTPFilePathURL,
-		SelfieFilePath: &updatedUserBody.SelfieFilePathURL,
+		Salary:         parsedSalary,
+		KTPFilePath:    updatedUserBody.KTPFilePathURL,
+		SelfieFilePath: updatedUserBody.SelfieFilePathURL,
 	}
 
 	if err := upc.userProfileRepo.UpdateUserProfile(&newUpdateProfile, userPayload.UserID); err != nil {
